@@ -1,7 +1,7 @@
 # deNOVOEnrich
 Identification of _de novo_ transposon insertion sites from targeted sequencing data generated through Transposon display Sequencing (TEd-Seq)
 
-<img src="images/denovoEnrich_logo.jpg" alt="denovoEnrich logo" />
+<img src="images/denonvoEnrich_logo.jpg" alt="denovoEnrich logo" width="300" height="300"/>
 
 ## Overview
 
