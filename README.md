@@ -7,7 +7,8 @@ Identification of _de novo_ transposon insertion sites from targeted sequencing 
 deNOVOEnrich is a computational pipeline developed to efficiently detect and profile genome-wide somatic transposition insertions, as well as non-reference heritable transposition events from targeted sequencing data generated through Transposon display sequencing (TEd-Seq). 
 
 The pipeline leverages high-confidence split read alignments to identify TE:genome break sites, enabling accurate detection of bona-fide non-reference somatic and heritable new insertions of a transposon. Stringent filters were applied at several critical steps of the pipeline to ensure removal of false positives and reduction of background noise signal.
-The details of the pipeline have been described in Ambreen et al., . 
+
+The details of the pipeline have been described in Ambreen et al. 
 
 ## Requirements
 
@@ -22,6 +23,9 @@ The details of the pipeline have been described in Ambreen et al., .
 - samtools (https://www.htslib.org/)
 - bedtools (https://bedtools.readthedocs.io/en/latest/index.html)
 - readtagger (https://pypi.org/project/readtagger/)
+
+Ensure that all required dependencies are properly installed in the working environment to avoid errors during run.
+
 
 
 
