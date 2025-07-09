@@ -32,8 +32,9 @@ Novel TE insertions are classified as either _de novo_ somatic or heritable (seg
 
 Further details of the pipeline can be found in Ambreen et al. 
 
-## Requirements
-deNOVOEnrich is executed through a Bash script and is designed for command-line use on Unix-based systems.
+
+## Installation & Requirements
+deNOVOEnrich is executed through a Bash script and is designed for command-line use on Unix-based systems. It does not need compilation. To install, simply clone the bash script and ensure that the main script is executable.
 
 - Linux 86X64 Systems
 - cutadapt (https://cutadapt.readthedocs.io/en/stable/)
