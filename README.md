@@ -69,7 +69,7 @@ Ensure that all required dependencies are properly installed in the working envi
 --Sample              Name of the sample (used in output filenames)
 --adapter             Path to Illumina adapter sequences file (e.g., TruSeq3-PE.fa)
 --outDir              Directory to store all output results
---TEfam               Transposon family of interest (Must match TE-specific file names e.g.: Use AtCopia93 for"
+--TEfam               Transposon family of interest (Must match TE-specific file names e.g., Use AtCopia93 for"
            			        AtCopia93_loci.bed or AtCopia93_flanking_sequence.fa)
 --monomeric_repeat    Bed file with coordinates of monomeric repeats of reference genome
 --CORES               Number of threads to use
@@ -79,6 +79,9 @@ Ensure that all required dependencies are properly installed in the working envi
 <pre> bash deNOVOEnrich.sh --Sample A1 --TEfam AtCopia93 --genome /path/genome.fa --ref_TE /path/TE_files --rawRead1 A1_1.fq --rawRead2 A1_2.fq --adapter /path/TruSeq3-PE.fa --outDir ./results --CORES 8 </pre>
 
 ## Outputs
+All key results are saved in a newly generated sub-directory named **Final_outputs**, located within the user-defined output directory.
+An additional sub-directory **temp** contains intermediate files generated during the pipeline run.
+
 - #### BAM file with soft-clipped tagged alignments.
   Useful for visualization of both somatic and heritable insertions in genome browsers.
   <pre>${Sample}_${TEfam}.uniq.split.readtagged.final.bam</pre>
@@ -97,6 +100,8 @@ Ensure that all required dependencies are properly installed in the working envi
   A 7-column BED file capturing all novel heritable insertions in the sample:
   <pre>${Sample}_${TEfam}.fixed_insertions.final.bed</pre> 
   The columns follow the same structure as described for somatic insertions.
+
+
 
  
   
