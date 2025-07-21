@@ -188,7 +188,7 @@ echo "==========================================================================
 echo ""
 echo "Retrieving TE-specific reads and removing low Quality or artefactual reads from raw sequencing data"
 echo ""
-source activate denovoenrich
+#source activate denovoenrich
 
 cutadapt --discard-untrimmed -g file:$ref_TE/${TEfam}_flanking_sequence.fa -e 0.2 -o $outTrim/sub_1.fastq -p $outTrim/sub_2.fastq $rawRead1 $rawRead2 -O 25 -j $CORES --nextseq-trim=20
 
@@ -331,14 +331,14 @@ echo "==========================================================================
 echo ""
 echo "Tagging Genome:TE alignments"
 
-source activate readtagger
+#source activate readtagger
 readtagger -t $outDir/${Sample}_raw_sub_final_${TEfam}_norm.assembled.sorted.uniq.split.dedup.bam -s $outDir/${Sample}_raw_sub_final_norm.assembled_${TEfam}_ext.sorted.dedup.bam -o $outDir/${Sample}_${TEfam}.uniq.split.readtagged.bam --cores $CORES 
 
 #conda deactivate
 
 ##Vb## Retrieving read-tagged alignment records for peak calling
 
-source activate denovoenrich
+#source activate denovoenrich
 samtools view -H --threads $CORES $outDir/${Sample}_${TEfam}.uniq.split.readtagged.bam > $outDir/${Sample}_${TEfam}.uniq.split.readtagged.final.bam
 
 samtools view $outDir/${Sample}_${TEfam}.uniq.split.readtagged.bam | grep "${TEfam}" >> $outDir/${Sample}_${TEfam}.uniq.split.readtagged.final.bam
