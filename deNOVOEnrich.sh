@@ -325,7 +325,7 @@ echo "You now have Reference and TE ALignments"
 echo ""
 echo "============================================================================="
 
-conda deactivate
+#conda deactivate
 ##Va## Tagging Alignments with Readtagger (target: Reference; source: TE_extremity)
 
 echo ""
@@ -334,7 +334,7 @@ echo "Tagging Genome:TE alignments"
 source activate readtagger
 readtagger -t $outDir/${Sample}_raw_sub_final_${TEfam}_norm.assembled.sorted.uniq.split.dedup.bam -s $outDir/${Sample}_raw_sub_final_norm.assembled_${TEfam}_ext.sorted.dedup.bam -o $outDir/${Sample}_${TEfam}.uniq.split.readtagged.bam --cores $CORES 
 
-conda deactivate
+#conda deactivate
 
 ##Vb## Retrieving read-tagged alignment records for peak calling
 
@@ -441,7 +441,7 @@ samtools view -hb $outDir/${Sample}_${TEfam}.uniq.split.readtagged.final.bam > $
 samtools index $outDir/${Sample}_${TEfam}.uniq.split.tagged_alignments.final.bam
 
 
-conda deactivate 
+#conda deactivate 
 rm $outDir/*.temp*.bed
 rm -r $outTrim
 
