@@ -28,7 +28,7 @@ In parallel, the assembled contigs are also aligned to the extremity sequence of
 In this crucial step, the alignments to the reference genome and targeted TEs are collated to preserve split contigs with shared read homology between the target TE and reference genomic sites. The TE read-tagged alignments are then used for calling new insertion sites.
 
 - #### Calling non-reference somatic and heritable transposition events
-Novel TE insertions are classified as either _de novo_ somatic or heritable (segregating) transposition events based on read depth at the insertion sites. All new insertion events marked by a read coverage of ≤5 are regarded as somatic events, while TE insertions with a threshold of ≥30 reads were classified as heritable transpositions. The identified putative insertions are filtered stringently to remove ambiguous events.
+Novel TE insertions are classified as either _de novo_ somatic or heritable (segregating) transposition events based on read depth at the insertion sites. All new insertion events marked by a read coverage of ≤5 (default) are regarded as somatic events, while TE insertions with a threshold of ≥30 reads (default) were classified as heritable transpositions. The cutoff thresholds used to define somatic and heritable TE insertions can be adjusted by the user based on the read coverage distribution (Highly recommended). The identified putative insertions are filtered stringently to remove ambiguous events.
 
 Further details of the pipeline can be found in Ambreen et al. 
 
@@ -71,12 +71,14 @@ Ensure that all required dependencies are properly installed in the working envi
 --outDir              Directory to store all output results
 --TEfam               Transposon family of interest (Must match TE-specific file names e.g., Use AtCopia93 for"
            			        AtCopia93_loci.bed or AtCopia93_flanking_sequence.fa)
+--somatic             Coverage threshold to call somatic insertions (Default = 5)
+--heritable           Coverage threshold to call non-reference segregating insertions (Default = 30) 
 --monomeric_repeat    Bed file with coordinates of monomeric repeats of reference genome
 --CORES               Number of threads to use
 --help | -h           Display this help message</pre>
 
 ### Example command
-<pre> bash deNOVOEnrich.sh --Sample A1 --TEfam AtCopia93 --genome /path/genome.fa --ref_TE /path/TE_files --rawRead1 A1_1.fq --rawRead2 A1_2.fq --adapter /path/TruSeq3-PE.fa --outDir ./results --CORES 8 </pre>
+<pre> bash deNOVOEnrich.sh --Sample A1 --TEfam AtCopia93 --genome /path/genome.fa --ref_TE /path/TE_files --rawRead1 A1_1.fq --rawRead2 A1_2.fq --adapter /path/TruSeq3-PE.fa --somatic 5 --heritable 30 --outDir ./results --CORES 8 </pre>
 
 ## Outputs
 All key results are saved in a newly generated sub-directory named **Final_outputs**, located within the user-defined output directory.
