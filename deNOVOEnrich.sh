@@ -294,7 +294,7 @@ samtools view -@ $CORES -F 4 $outDir/${Sample}_raw_sub_final_${TEfam}_norm.assem
 
 samtools view -H --threads $CORES $outDir/${Sample}_raw_sub_final_${TEfam}_norm.assembled.sorted.uniq.bam > $outDir/${Sample}_raw_sub_final_${TEfam}_norm.assembled.sorted.uniq.tmp.header
 
-awk '$6~/^[4-8][0-9]S/ || $6~/[4-8][0-9]S$/ || $6~/^1[0-9][0-9]S/ || $6~/1[0-9][0-9]S$/' $outDir/${Sample}_raw_sub_final_${TEfam}_norm.assembled.sorted.uniq.bam | cat $outDir/${Sample}_raw_sub_final_${TEfam}_norm.assembled.sorted.uniq.tmp.header - | samtools view -@ 40 -bh - | samtools sort -@ 40 -o $outDir/${Sample}_raw_sub_final_${TEfam}_norm.assembled.sorted.uniq.split.bam -
+awk '$6~/^[4-9][0-9]S/ || $6~/[4-9][0-9]S$/ || $6~/^1[0-9][0-9]S/ || $6~/1[0-9][0-9]S$/' $outDir/${Sample}_raw_sub_final_${TEfam}_norm.assembled.sorted.uniq.bam | cat $outDir/${Sample}_raw_sub_final_${TEfam}_norm.assembled.sorted.uniq.tmp.header - | samtools view -@ 40 -bh - | samtools sort -@ 40 -o $outDir/${Sample}_raw_sub_final_${TEfam}_norm.assembled.sorted.uniq.split.bam -
 
 echo "You now have Unique and Clipped ALignemnts from reference mapping"
 echo ""
