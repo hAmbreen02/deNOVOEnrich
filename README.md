@@ -103,6 +103,11 @@ An additional sub-directory **temp** contains intermediate files generated durin
   <pre>${Sample}_${TEfam}.fixed_insertions.final.bed</pre> 
   The columns follow the same structure as described for somatic insertions.
 
+  ## Cite
+  If you use this software, please cite:
+
+  Somatic mobility of transposons is explosive and shaped by distinct integration biases in _Arabidopsis thaliana_. Ambreen H, Leduque B, Quadrana L, Slotkin RK, Bousios A, Nützmann HW. BioRxiv. 2025
+
 
 
  
