@@ -294,7 +294,7 @@ samtools view -@ $CORES -F 4 $outDir/${Sample}_raw_sub_final_${TEfam}_norm.assem
 
 samtools view -H --threads $CORES $outDir/${Sample}_raw_sub_final_${TEfam}_norm.assembled.sorted.uniq.bam > $outDir/${Sample}_raw_sub_final_${TEfam}_norm.assembled.sorted.uniq.tmp.header
 
-awk '$6~/^[4-9][0-9]S/ || $6~/[4-9][0-9]S$/ || $6~/^1[0-9][0-9]S/ || $6~/1[0-9][0-9]S$/' $outDir/${Sample}_raw_sub_final_${TEfam}_norm.assembled.sorted.uniq.bam | cat $outDir/${Sample}_raw_sub_final_${TEfam}_norm.assembled.sorted.uniq.tmp.header - | samtools view -@ 40 -bh - | samtools sort -@ 40 -o $outDir/${Sample}_raw_sub_final_${TEfam}_norm.assembled.sorted.uniq.split.bam -
+awk '$6~/^[4-9][0-9]S/ || $6~/[4-9][0-9]S$/ || $6~/^1[0-9][0-9]S/ || $6~/1[0-9][0-9]S$/' $outDir/${Sample}_raw_sub_final_${TEfam}_norm.assembled.sorted.uniq.bam | cat $outDir/${Sample}_raw_sub_final_${TEfam}_norm.assembled.sorted.uniq.tmp.header - | samtools view -@ $CORES -bh - | samtools sort -@ $CORES -o $outDir/${Sample}_raw_sub_final_${TEfam}_norm.assembled.sorted.uniq.split.bam -
 
 echo "You now have Unique and Clipped ALignemnts from reference mapping"
 echo ""
@@ -319,7 +319,7 @@ echo "Mapping on reference TE"
 
 bowtie2-build --threads $CORES $ref_TE/${TEfam}_flanking_sequence_2.fa $outDir/${TEfam}_extremity
 
-bowtie2 -x $outDir//${TEfam}_extremity -U $outDir/${Sample}_raw_sub_final_${TEfam}_norm.assembled.fastq -S $outDir/${Sample}_raw_sub_final_norm.assembled_${TEfam}_ext.sam --local --very-sensitive --threads $CORES
+bowtie2 -x $outDir/${TEfam}_extremity -U $outDir/${Sample}_raw_sub_final_${TEfam}_norm.assembled.fastq -S $outDir/${Sample}_raw_sub_final_norm.assembled_${TEfam}_ext.sam --local --very-sensitive --threads $CORES
 
 samtools view -bhS -@ $CORES $outDir/${Sample}_raw_sub_final_norm.assembled_${TEfam}_ext.sam | samtools sort -@ $CORES -o $outDir/${Sample}_raw_sub_final_norm.assembled_${TEfam}_ext.sorted.bam
 
