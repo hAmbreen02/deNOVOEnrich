@@ -73,12 +73,12 @@ Ensure that all required dependencies are properly installed in the working envi
            			        AtCopia93_loci.bed or AtCopia93_flanking_sequence.fa)
 --somatic             Coverage threshold to call somatic insertions (Default = 5)
 --heritable           Coverage threshold to call non-reference segregating insertions (Default = 30) 
---monomeric_repeat    Bed file with coordinates of monomeric repeats of reference genome
+--mononucl_repeat    Bed file with coordinates of monomeric repeats of reference genome
 --CORES               Number of threads to use
 --help | -h           Display this help message</pre>
 
 ### Example command
-<pre> bash deNOVOEnrich.sh --Sample A1 --TEfam AtCopia93 --genome /path/genome.fa --ref_TE /path/TE_files --rawRead1 A1_1.fq --rawRead2 A1_2.fq --adapter /path/TruSeq3-PE.fa --somatic 5 --heritable 30 --outDir ./results --CORES 8 </pre>
+<pre> bash deNOVOEnrich.sh --Sample A1 --TEfam AtCopia93 --genome /path/genome.fa --ref_TE /path/TE_files --rawRead1 A1_1.fq --rawRead2 A1_2.fq --adapter /path/TruSeq3-PE.fa --somatic 5 --heritable 30 --mononucl_repeat mononucl_repeats.bed --outDir ./results --CORES 8 </pre>
 
 ## Outputs
 All key results are saved in a newly generated sub-directory named **Final_outputs**, located within the user-defined output directory.
@@ -106,8 +106,7 @@ An additional sub-directory **temp** contains intermediate files generated durin
   ## Cite
   If you use this software, please cite:
 
-  Somatic mobility of transposons is explosive and shaped by distinct integration biases in _Arabidopsis thaliana_. Ambreen H, Leduque B, Quadrana L, Slotkin RK, Bousios A, Nützmann HW. BioRxiv. 2025
-
+Ambreen, H., Leduque, B., Quadrana, L., Slotkin, R.K., Bousios, A. and Nützmann, H.W., 2026. Somatic mobility of transposons is explosive and shaped by distinct integration biases in Arabidopsis thaliana. Genome Biology.
 
 
  
