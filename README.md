@@ -73,7 +73,7 @@ Ensure that all required dependencies are properly installed in the working envi
            			        AtCopia93_loci.bed or AtCopia93_flanking_sequence.fa)
 --somatic             Coverage threshold to call somatic insertions (Default = 5)
 --heritable           Coverage threshold to call non-reference segregating insertions (Default = 30) 
---mononucl_repeat    Bed file with coordinates of monomeric repeats of reference genome
+--mononucl_repeat    Bed file with coordinates of mononucleotide repeats of reference genome
 --CORES               Number of threads to use
 --help | -h           Display this help message</pre>
 
