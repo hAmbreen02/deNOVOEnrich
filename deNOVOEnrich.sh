@@ -37,16 +37,16 @@ echo " --Sample			Name of the sample "
 echo " --adapter			Path to Illumina adapter sequences file (e.g., TruSeq3-PE.fa)"
 echo " --outDir			Directory to store all output results"
 echo " --TEfam			Transposon family of Interest" 
-echo "				    (Must match TE-specific Samplenames example: Use AtCopia93 for"
+echo "				    (Must match TE-specific Sample names example: Use AtCopia93 for"
 echo "				    AtCopia93_loci.bed or AtCopia93_flanking_sequence.fa"
 echo " --somatic                        Coverage threshold to call somatic insertions (Default = 5)"
 echo " --heritable                      Coverage threshold to call non-reference segregating insertions (Default = 30)"
-echo " --monomeric_repeat		Bed file with coordinates of monomeric repeats of reference genome"
+echo " --mononucl_repeat		Bed file with coordinates of mononucleotide repeats of reference genome"
 echo " --CORES			Number of threads to use"
 echo " --help |-h			Display this help message"
 echo ""
 echo "Example:"
-echo "  bash deNOVOEnrich.sh --Sample col1 --TEfam AtCopia93 --genome /path/genome.fa --ref_TE /path/TE_files --rawRead1 A1_1.fq --rawRead2 A1_2.fq --adapter /path/TruSeq3-PE.fa --somatic 5 --heritable 30 --outDir ./results --CORES 8"
+echo "  bash deNOVOEnrich.sh --Sample col1 --TEfam AtCopia93 --genome /path/genome.fa --ref_TE /path/TE_files --rawRead1 A1_1.fq --rawRead2 A1_2.fq --adapter /path/TruSeq3-PE.fa --somatic 5 --heritable 30 --mononucl_repeat mononucl_repeats.bed --outDir ./results --CORES 8"
 
 echo "================================================================================"
 echo 
@@ -88,6 +88,7 @@ done
 #  --TEfam          Transposon family of Interest. The name should match the TE-specific filenames
 #  --somatic        Coverage threshold to call somatic insertions (Default = 5)
 #  --heritable      Coverage threshold to call non-reference segregating insertions (Default = 30)
+#  --mononucl_repeat    Bed file with coordinates of mononucleotide repeats of reference genome
 #  --CORES          Number of threads to use 
 #  --help | -h		Display this help message
 #####----------------------------------####### 
@@ -109,7 +110,7 @@ done
 # Genomic coordinates of the native TE loci in the reference genome 
 # Format: ($Chr $Start $End). Column $4 with names is optional
 
-# Genome_monomeric_repeat.bed:
+# Genome_mononucl_repeat.bed:
 # Genomic coordinates of mono-nucleotide repeats in reference genome 
 #####----------------------------------####### 
 
@@ -125,7 +126,7 @@ outDir="./deNOVOEnrich_output"
 TEfam="AtCopiaX"
 somatic_cov=5
 heritable_cov=30
-monomeric_repeat=""            
+mononucl_repeat=""            
 CORES=8 
 
 
@@ -143,7 +144,7 @@ while [[ "$#" -gt 0 ]]; do
         --TEfam) TEfam="$2"; shift ;;
         --somatic) somatic_cov="$2"; shift;;
         --heritable) heritable_cov="$2"; shift;;
-        --monomeric_repeat) monomeric_repeat="$2"; shift ;;
+        --mononucl_repeat) mononucl_repeat="$2"; shift ;;
         --help|-h) show_help; exit 0 ;;
         *) echo " Unknown parameter: $1"; show_help; exit 1 ;;
     esac
@@ -151,7 +152,7 @@ while [[ "$#" -gt 0 ]]; do
 done
 
 
-if [[ -z "$genome" || -z "$ref_TE" || -z "$rawRead1" || -z "$rawRead2" || -z "$Sample" || -z "$adapter" || -z "$outDir" || -z "$TEfam" || -z "$monomeric_repeat" || -z "$CORES" ]]; then
+if [[ -z "$genome" || -z "$ref_TE" || -z "$rawRead1" || -z "$rawRead2" || -z "$Sample" || -z "$adapter" || -z "$outDir" || -z "$TEfam" || -z "$mononucl_repeat" || -z "$CORES" ]]; then
     echo " ERROR: One or more required arguments are missing."
     show_help
     exit 1
@@ -188,7 +189,7 @@ echo "Heritable coverage cutoff : ≥$heritable_cov"
 echo "Adapter File           : $adapter"
 echo "Output Directory       : $outDir"
 echo "Threads (CORES)        : $CORES"
-echo "Monomeric Repeat BED   : $monomeric_repeat"
+echo "Mononucleotide Repeat BED   : $mononucl_repeat"
 echo ""
 echo "============================================================================="
 
@@ -344,11 +345,13 @@ readtagger -t $outDir/${Sample}_raw_sub_final_${TEfam}_norm.assembled.sorted.uni
 
 ##Vb## Retrieving read-tagged alignment records for peak calling
 
+samtools sort -@ $CORES -o $outDir/${Sample}_${TEfam}.uniq.split.readtagged.sorted.bam $outDir/${Sample}_${TEfam}.uniq.split.readtagged.bam
 
-samtools view -H --threads $CORES $outDir/${Sample}_${TEfam}.uniq.split.readtagged.bam > $outDir/${Sample}_${TEfam}.uniq.split.readtagged.final.bam
+samtools index $outDir/${Sample}_${TEfam}.uniq.split.readtagged.sorted.bam
 
-samtools view $outDir/${Sample}_${TEfam}.uniq.split.readtagged.bam | grep "${TEfam}" >> $outDir/${Sample}_${TEfam}.uniq.split.readtagged.final.bam
+samtools view -h --threads $CORES $outDir/${Sample}_${TEfam}.uniq.split.readtagged.sorted.bam | grep -E "^@|${TEfam}" | samtools view -@ $CORES -b - | samtools sort -@ $CORES -o $outDir/${Sample}_${TEfam}.uniq.split.readtagged.final.bam -
 
+samtools index $outDir/${Sample}_${TEfam}.uniq.split.readtagged.final.bam
 
 
 echo ""
@@ -389,7 +392,7 @@ awk '{{if ($3=="-") print $1"\t"$2-1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6} if( $3=="+")
 
 bedtools window -v -w 1000 -a $outDir/${Sample}_${TEfam}.putative.fixed_insertions.temp1.bed  -b $ref_TE/${TEfam}_loci.bed > $outDir/${Sample}_${TEfam}.fixed_insertions.temp2.bed
 
-bedtools window -v -w 50 -a $outDir/${Sample}_${TEfam}.fixed_insertions.temp2.bed -b $monomeric_repeat > $outDir/${Sample}_${TEfam}.fixed_insertions.final.bed 
+bedtools window -v -w 50 -a $outDir/${Sample}_${TEfam}.fixed_insertions.temp2.bed -b $mononucl_repeat > $outDir/${Sample}_${TEfam}.fixed_insertions.final.bed 
 
 awk '{{if ($4=="-") print $1"\t"$3"\t"$4"\t"$5"\t"$6"\t"$7} if( $4=="+")  print $1"\t"$2"\t"$4"\t"$5"\t"$6"\t"$7}' $outDir/${Sample}_${TEfam}.fixed_insertions.final.bed > $outDir/${Sample}_${TEfam}.fixed_insertions.final.startsite.bed 
 
@@ -407,7 +410,7 @@ echo ""
 awk '$5==1 && $4==1 {print $0}' $outDir/${Sample}_${TEfam}.uniq.split.readtagged.final.bamtobed.startsite.sorted.bed > $outDir/${Sample}_${TEfam}.putative_rare_soma_insertions.bed
 awk '{{if ($3=="-") print $1"\t"$2-1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6} if( $3=="+")  print $1"\t"$2"\t"$2+1"\t"$3"\t"$4"\t"$5"\t"$6}' $outDir/${Sample}_${TEfam}.putative_rare_soma_insertions.bed > $outDir/${Sample}_${TEfam}.putative_rare_soma_insertions.temp1.bed
 bedtools window -v -w 1000 -a $outDir/${Sample}_${TEfam}.putative_rare_soma_insertions.temp1.bed  -b $ref_TE/${TEfam}_loci.bed > $outDir/${Sample}_${TEfam}.putative_rare_soma_insertions.temp2.bed
-bedtools window -v -w 50 -a $outDir/${Sample}_${TEfam}.putative_rare_soma_insertions.temp2.bed -b $monomeric_repeat > $outDir/${Sample}_${TEfam}_rare_soma_insertions.final.bed 
+bedtools window -v -w 50 -a $outDir/${Sample}_${TEfam}.putative_rare_soma_insertions.temp2.bed -b $mononucl_repeat > $outDir/${Sample}_${TEfam}_rare_soma_insertions.final.bed 
 awk '{{if ($4=="-") print $1"\t"$3"\t"$4"\t"$5"\t"$6"\t"$7} if( $4=="+")  print $1"\t"$2"\t"$4"\t"$5"\t"$6"\t"$7}' $outDir/${Sample}_${TEfam}_rare_soma_insertions.final.bed > $outDir/${Sample}_${TEfam}_rare_soma_insertions.final.startsite.bed 
 
 
@@ -415,15 +418,15 @@ awk '{{if ($4=="-") print $1"\t"$3"\t"$4"\t"$5"\t"$6"\t"$7} if( $4=="+")  print 
 awk '$5==1 && $4>1 {print $0}' $outDir/${Sample}_${TEfam}.uniq.split.readtagged.final.bamtobed.startsite.sorted.bed > $outDir/${Sample}_${TEfam}.putative_recent_soma_insertions.bed
 awk '{{if ($3=="-") print $1"\t"$2-1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6} if( $3=="+")  print $1"\t"$2"\t"$2+1"\t"$3"\t"$4"\t"$5"\t"$6}' $outDir/${Sample}_${TEfam}.putative_recent_soma_insertions.bed > $outDir/${Sample}_${TEfam}.putative_recent_soma_insertions.temp1.bed
 bedtools window -v -w 1000 -a $outDir/${Sample}_${TEfam}.putative_recent_soma_insertions.temp1.bed  -b $ref_TE/${TEfam}_loci.bed > $outDir/${Sample}_${TEfam}.putative_recent_soma_insertions.temp2.bed
-bedtools window -v -w 50 -a $outDir/${Sample}_${TEfam}.putative_recent_soma_insertions.temp2.bed -b $monomeric_repeat > $outDir/${Sample}_${TEfam}_recent_soma_insertions.final.bed 
+bedtools window -v -w 50 -a $outDir/${Sample}_${TEfam}.putative_recent_soma_insertions.temp2.bed -b $mononucl_repeat > $outDir/${Sample}_${TEfam}_recent_soma_insertions.final.bed 
 awk '{{if ($4=="-") print $1"\t"$3"\t"$4"\t"$5"\t"$6"\t"$7} if( $4=="+")  print $1"\t"$2"\t"$4"\t"$5"\t"$6"\t"$7}' $outDir/${Sample}_${TEfam}_recent_soma_insertions.final.bed > $outDir/${Sample}_${TEfam}_recent_soma_insertions.final.startsite.bed 
 
 
 ##primary somatic insertions (occurred very early in development/experimental phase) where more than 1 unique reads with 1 or more pcr duplicates are available 
-awk '$5 < 5 && $5 > 1 && $4 >= 2 * $5 && $4 < 30 {print $0}' $outDir/${Sample}_${TEfam}.uniq.split.readtagged.final.bamtobed.startsite.sorted.bed > $outDir/${Sample}_${TEfam}.putative_early_soma_insertions.bed
+awk -v HC="$heritable_cov" '$5 < 5 && $5 > 1 && $4 >= 2 * $5 && $4 < HC {print $0}' $outDir/${Sample}_${TEfam}.uniq.split.readtagged.final.bamtobed.startsite.sorted.bed > $outDir/${Sample}_${TEfam}.putative_early_soma_insertions.bed
 awk '{{if ($3=="-") print $1"\t"$2-1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6} if( $3=="+")  print $1"\t"$2"\t"$2+1"\t"$3"\t"$4"\t"$5"\t"$6}' $outDir/${Sample}_${TEfam}.putative_early_soma_insertions.bed > $outDir/${Sample}_${TEfam}.putative_early_soma_insertions.temp1.bed
 bedtools window -v -w 1000 -a $outDir/${Sample}_${TEfam}.putative_early_soma_insertions.temp1.bed  -b $ref_TE/${TEfam}_loci.bed > $outDir/${Sample}_${TEfam}.putative_early_soma_insertions.temp2.bed
-bedtools window -v -w 50 -a $outDir/${Sample}_${TEfam}.putative_early_soma_insertions.temp2.bed -b $monomeric_repeat > $outDir/${Sample}_${TEfam}_early_soma_insertions.final.bed 
+bedtools window -v -w 50 -a $outDir/${Sample}_${TEfam}.putative_early_soma_insertions.temp2.bed -b $mononucl_repeat > $outDir/${Sample}_${TEfam}_early_soma_insertions.final.bed 
 awk '{{if ($4=="-") print $1"\t"$3"\t"$4"\t"$5"\t"$6"\t"$7} if( $4=="+")  print $1"\t"$2"\t"$4"\t"$5"\t"$6"\t"$7}' $outDir/${Sample}_${TEfam}_early_soma_insertions.final.bed > $outDir/${Sample}_${TEfam}_early_soma_insertions.final.startsite.bed 
 
 ##VIIb##combine all soma insertions: Total somatic insertions
@@ -440,17 +443,16 @@ echo ""
 echo "============================================================================="
 echo ""
 
-samtools view -hb $outDir/${Sample}_${TEfam}.uniq.split.readtagged.final.bam > $outDir/${Sample}_${TEfam}.uniq.split.tagged_alignments.final.bam
+cp $outDir/${Sample}_${TEfam}.uniq.split.readtagged.final.bam $outDir/${Sample}_${TEfam}.uniq.split.tagged_alignments.final.bam
 
-samtools index $outDir/${Sample}_${TEfam}.uniq.split.tagged_alignments.final.bam
-
+cp $outDir/${Sample}_${TEfam}.uniq.split.readtagged.final.bam.bai $outDir/${Sample}_${TEfam}.uniq.split.tagged_alignments.final.bam.bai
  
 rm $outDir/*.temp*.bed
 rm -r $outTrim
 
 temp=$outDir/tempDir
 mkdir -p $temp
-mv $outDir/* $temp
+find "$outDir" -mindepth 1 -maxdepth 1 ! -name "tempDir" -exec mv -t "$temp" {} +
 
 finalDir=$outDir/Final_outputs
 mkdir -p $finalDir
