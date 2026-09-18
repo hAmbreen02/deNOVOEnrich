@@ -5,7 +5,7 @@ This directory contains test files to validate and demonstrate the usage of the 
 The paired-end test FASTQ files (Test_1.fq.bz2 & Test_2.fq.bz2) are compressed with bzip2. Before running the pipeline, these files should be extracted, as the pipeline **does not accept .bz2 files** directly.
 
 ## Reference genome
-The test run uses chromosome 1 of the Arabidopsis thaliana **Col-CEN reference** assembly.
+The test run uses chromosome 1 of the Arabidopsis thaliana **Col-CEN reference** assembly. The gzipped FASTA file, **Arabidopsis.fasta.gz**, includes Chr1 and organelle genomes - ChrC and ChrM.
 
 ## Mononucleotide file
 The BED file, **Arabidopsis_mononucl_repeat.bed**, includes genomic coordinates for mononucleotide repeats for chromosome 1 of the Col-CEN reference.
